@@ -1,0 +1,1 @@
+//Importa a função de criação do Client Supabase via
