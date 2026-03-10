@@ -1,1 +1,1 @@
-# listacompras2026
+# ListaCompras2026
