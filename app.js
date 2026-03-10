@@ -34,7 +34,7 @@ window.adicionarItem = async function () {
   console.log('UsuÃ¡rio:', user)
   console.log('Item:', input.value)
 
-  const { error } = await supabase.from('lista_compras').insert({
+  const { error } = await supabase.from('lista.compras').insert({
     item: input.value,
     adicionada_por: user.id // Certifique-se que a coluna existe e Ã© do tipo uuid
   })
@@ -47,7 +47,7 @@ window.adicionarItem = async function () {
 
 // Remove item da lista pelo ID
 window.removerItem = async function (id) {
-  const { error } = await supabase.from('lista_compras').delete().eq('id', id)
+  const { error } = await supabase.from('lista.compras').delete().eq('id', id)
   if (error) return alert('Erro ao remover: ' + error.message)
   carregarLista()
 }
