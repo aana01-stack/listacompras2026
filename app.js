@@ -13,7 +13,7 @@ const input = document.getElementById('item')
 
 // Carrega a lista de compras do Supabase
 async function carregarLista() {
-  const { data, error } = await supabase.from('lista_compras').select('*')
+  const { data, error } = await supabase.from('lista.compras').select('*')
   if (error) {
     console.error('Erro ao carregar lista:', error)
     return
