@@ -27,9 +27,9 @@
 
 body{
     font-family: var (--fonte);
-    background: #6F1D1B;
-background: linear-gradient(90deg, rgba(111, 29, 27, 1) 0%, 
-rgba(67, 40, 24, 1) 50%, rgba(125, 72, 36, 1) 84%, rgba(153, 88, 42, 1) 100%);
+     background: #3F5EFB;
+background: radial-gradient(circle,rgba(63, 94, 251, 1) 0%,
+ rgba(252, 70, 107, 1) 100%);
     display: flex;
     justify-content: center;
     align-items: center;
