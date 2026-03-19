@@ -9,17 +9,17 @@
 
     --cor-branco: #fff;
     --cor-preto: #1d1d1d;
-    --cor-sombra:rgba(0,0,0,0.15);
-    --cor-texto:#333;
+    --cor-sombra: rgba(0, 0, 0, 0.15);
+    --cor-texto: #333;
 
-    --fonte:"Poppins", sans-serif;
+    --fonte: "Poppins", sans-serif;
 
-    --raio: 12pix;
-    --trasinton: 0.3s ease;
-
+    --raio: 12px;
+    --transition: 0.3s ease;
 
 }
-*{
+
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
