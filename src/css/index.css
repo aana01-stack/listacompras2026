@@ -74,7 +74,7 @@ button[onclick="logout()"] {
     transition: var(--transition);
 }
 
-button[onclick="logout()"]: hover {
+button[onclick="logout()"]:hover {
 backgroud-color: var(--cor-primaria-2)
 }
 
@@ -119,9 +119,9 @@ backgroud-color: var(--cor-primaria-2)
     transition: var(--transition);
 }
 
-#item: focus{
+#item:focus{
     border: 1px solid var(--cor-primaria-1);
-    outline: none;
+    outline:none;
     box-shadow: 0 2px 6px var(-cor-texto);
 }
 
@@ -136,7 +136,7 @@ button[onclick="adicionarItem()"] {
     transition: var(--transition);
 }
 
-button[onclick="adicionarItem()"]: :hover {
+button[onclick="adicionarItem()"]:hover {
     background-color: var(--cor-primaria-2);
 }
 
