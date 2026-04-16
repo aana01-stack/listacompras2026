@@ -2,29 +2,53 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista De Compras 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Login | Lista de Compras 2026</title>
     <link rel="manifest" href="manifest.json">
-    link
     <link rel="shortcut icon" href="src/css/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="src/css/login.css">
+    <!-- Fonte Poppins já está no CSS -->
 </head>
 <body>
-    <div class="container">
-        <img src="src/css/icons/Favicon-512.png" alt="Logo" id="logo">
-        <h2 class="titulo">Login</h2>
-        <input type="email" id="email" placeholder="E-mail">
-        <input type="password" id="senha" placeholder="Senha">
-        
-        <div class="botoes">
-            <button onclick="login()">Entrar</button>
-            <button onclick="cadastro()">Cadastrar</button>
+    <div class="login-container">
+        <div class="glass-card">
+            <div class="logo-wrapper">
+                <img src="src/css/icons/Favicon-512.png" alt="Logo Lista 2026" id="logo">
+            </div>
+            
+            <div class="header-text">
+                <h1 class="titulo">Bem-vindo de volta</h1>
+                <p class="subtitulo">Entre para sincronizar suas listas</p>
+            </div>
+
+            <form id="login-form" onsubmit="event.preventDefault(); login();">
+                <div class="input-group">
+                    <input type="email" id="email" name="email" required placeholder=" ">
+                    <label for="email">E-mail</label>
+                    <span class="input-icon">📧</span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="senha" name="senha" required placeholder=" ">
+                    <label for="senha">Senha</label>
+                    <span class="input-icon">🔒</span>
+                </div>
+
+                <button type="submit" class="btn-primary">Entrar</button>
+                
+                <div class="separator">
+                    <span>ou</span>
+                </div>
+
+                <button type="button" class="btn-secondary" onclick="cadastro()">Criar uma conta gratuita</button>
+            </form>
         </div>
     </div>
 
     <script type="module" src="auth.js"></script>
 
-<script>
+    <script>
+        // Service Worker (Mantido igual)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -37,6 +61,5 @@
             });
         }
     </script>
-    
 </body>
 </html>
