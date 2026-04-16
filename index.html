@@ -9,48 +9,101 @@
     <link rel="stylesheet" href="src/css/index.css">
 </head>
 <body>
+    <!-- Skip to Content para Acessibilidade -->
+    <a href="#main-content" class="skip-to-content" aria-label="Pular para conteúdo principal">
+        Pular para conteúdo
+    </a>
+
+    <!-- Controles de Acessibilidade -->
+    <div class="accessibility-controls" role="region" aria-label="Controles de acessibilidade">
+        <button class="a11y-btn" onclick="toggleVoiceNavigation()" aria-label="Ativar navegação por voz" id="voiceNavBtn">
+            <span class="a11y-icon">🎤</span>
+            <span class="a11y-text">Voz</span>
+        </button>
+        <button class="a11y-btn" onclick="toggleHighContrast()" aria-label="Alto contraste" id="contrastBtn">
+            <span class="a11y-icon">◐</span>
+            <span class="a11y-text">Contraste</span>
+        </button>
+        <button class="a11y-btn" onclick="increaseFontSize()" aria-label="Aumentar fonte">
+            <span class="a11y-icon">A+</span>
+        </button>
+        <button class="a11y-btn" onclick="decreaseFontSize()" aria-label="Diminuir fonte">
+            <span class="a11y-icon">A-</span>
+        </button>
+        <button class="a11y-btn" onclick="toggleScreenReader()" aria-label="Ativar leitor de tela" id="screenReaderBtn">
+            <span class="a11y-icon">🔊</span>
+            <span class="a11y-text">Leitor</span>
+        </button>
+        <button class="a11y-btn" onclick="openLibrasModal()" aria-label="Abrir tradutor de Libras">
+            <span class="a11y-icon">🤟</span>
+            <span class="a11y-text">Libras</span>
+        </button>
+    </div>
+
     <!-- Indicador de Status Offline -->
-    <div id="offlineIndicator" class="offline-indicator hidden">
-        <span class="offline-icon">📡</span>
+    <div id="offlineIndicator" class="offline-indicator hidden" role="alert" aria-live="polite">
+        <span class="offline-icon" aria-hidden="true">📡</span>
         <span class="offline-text">Você está offline</span>
         <span class="offline-subtext">Alterações serão sincronizadas quando conectar</span>
     </div>
 
+    <!-- Feedback de Voz (Visual para Surdos) -->
+    <div id="voiceFeedback" class="voice-feedback hidden" role="status" aria-live="polite">
+        <div class="voice-wave"></div>
+        <span id="voiceText">Ouvindo...</span>
+    </div>
+
+    <!-- Modal de Libras -->
+    <div id="librasModal" class="modal hidden" role="dialog" aria-labelledby="librasTitle">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeLibrasModal()" aria-label="Fechar tradutor de Libras">&times;</button>
+            <h2 id="librasTitle">Tradutor de Libras</h2>
+            <div class="libras-container">
+                <div id="librasVideo" class="libras-video" aria-label="Intérprete de Libras">
+                    <span role="img" aria-label="Intérprete de Libras">🤟👐✋</span>
+                </div>
+                <p class="libras-text">Digite para traduzir:</p>
+                <input type="text" id="librasInput" class="libras-input" placeholder="Digite uma palavra..." aria-label="Texto para traduzir em Libras">
+                <button onclick="translateToLibras()" class="libras-translate-btn" aria-label="Traduzir para Libras">Traduzir</button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-wrapper">
         <!-- Header Glass -->
-        <header class="app-header">
+        <header class="app-header" role="banner">
             <div class="header-content">
                 <div class="user-greeting">
-                    <div class="avatar" id="userAvatar">👤</div>
+                    <div class="avatar" id="userAvatar" role="img" aria-label="Avatar do usuário">👤</div>
                     <div class="greeting-text">
                         <span class="greeting-label">Olá,</span>
                         <span class="user-name" id="userDisplayName">Usuário</span>
                     </div>
                 </div>
                 <div class="header-actions">
-                    <div id="syncStatus" class="sync-status synced" title="Sincronizado">
-                        <span class="sync-icon">☁️</span>
+                    <div id="syncStatus" class="sync-status synced" title="Sincronizado" role="status" aria-label="Status de sincronização">
+                        <span class="sync-icon" aria-hidden="true">☁️</span>
                     </div>
-                    <button class="logout-btn" onclick="logout()" aria-label="Sair da conta">
-                        <span class="logout-icon">🚪</span>
+                    <button class="logout-btn" onclick="logout()" aria-label="Sair da conta" title="Sair">
+                        <span class="logout-icon" aria-hidden="true">🚪</span>
                         <span class="logout-text">Sair</span>
                     </button>
                 </div>
             </div>
             <h1 class="page-title">
-                <span class="title-icon">🛒</span>
+                <span class="title-icon" aria-hidden="true">🛒</span>
                 Minha Lista de Compras
             </h1>
         </header>
 
         <!-- Container Principal -->
-        <main class="main-content">
+        <main id="main-content" class="main-content" role="main">
             <!-- Área da Lista -->
-            <div class="list-container">
+            <div class="list-container" role="region" aria-label="Lista de compras">
                 <div class="list-header">
                     <h2 class="section-title">Itens da Lista</h2>
                     <div class="list-stats">
-                        <span class="item-count" id="itemCount">0 itens</span>
+                        <span class="item-count" id="itemCount" role="status" aria-live="polite">0 itens</span>
                         <select id="categoryFilter" class="category-filter" aria-label="Filtrar por categoria">
                             <option value="all">Todas categorias</option>
                             <option value="hortifruti">🍎 Hortifruti</option>
@@ -65,20 +118,36 @@
                     </div>
                 </div>
                 
-                <ul id="lista" class="shopping-list">
+                <!-- Tabela de Preços -->
+                <div class="price-summary" role="region" aria-label="Resumo de preços">
+                    <div class="price-row">
+                        <span class="price-label">Total:</span>
+                        <span class="price-value" id="totalPrice">R$ 0,00</span>
+                    </div>
+                    <div class="price-row estimated">
+                        <span class="price-label">Economia estimada:</span>
+                        <span class="price-value" id="savedAmount">R$ 0,00</span>
+                    </div>
+                    <button class="ifood-btn" onclick="searchOnIfood()" aria-label="Buscar itens no iFood">
+                        <span class="ifood-icon">🛵</span>
+                        <span class="ifood-text">Buscar no iFood</span>
+                    </button>
+                </div>
+                
+                <ul id="lista" class="shopping-list" role="list" aria-label="Itens da lista de compras">
                     <!-- Itens serão inseridos via JS -->
                 </ul>
 
                 <!-- Empty State -->
-                <div id="emptyState" class="empty-state">
-                    <div class="empty-icon">📝</div>
+                <div id="emptyState" class="empty-state" role="status">
+                    <div class="empty-icon" aria-hidden="true">📝</div>
                     <h3>Sua lista está vazia</h3>
                     <p>Adicione itens para começar suas compras</p>
                 </div>
             </div>
 
             <!-- Área de Adição -->
-            <div class="add-section">
+            <div class="add-section" role="region" aria-label="Adicionar novo item">
                 <div class="add-container">
                     <div class="input-wrapper">
                         <input 
@@ -86,7 +155,17 @@
                             id="item" 
                             placeholder="O que você precisa comprar?"
                             autocomplete="off"
-                            aria-label="Novo item para adicionar à lista"
+                            aria-label="Nome do novo item"
+                            aria-required="true"
+                        >
+                        <input 
+                            type="number" 
+                            id="itemPrice" 
+                            placeholder="Preço (R$)"
+                            step="0.01"
+                            min="0"
+                            class="price-input"
+                            aria-label="Preço do item em reais"
                         >
                         <select id="itemCategory" class="item-category-select" aria-label="Categoria do item">
                             <option value="hortifruti">🍎</option>
@@ -99,14 +178,18 @@
                             <option value="outros" selected>📦</option>
                         </select>
                     </div>
-                    <button onclick="adicionarItem()" class="add-btn" aria-label="Adicionar item">
-                        <span class="add-icon">+</span>
+                    <button onclick="adicionarItem()" class="add-btn" aria-label="Adicionar item à lista">
+                        <span class="add-icon" aria-hidden="true">+</span>
                         <span class="add-text">Adicionar</span>
                     </button>
                 </div>
                 <div class="input-hint">
-                    <span class="hint-icon">💡</span>
+                    <span class="hint-icon" aria-hidden="true">💡</span>
                     <span class="hint-text">Pressione Enter para adicionar rapidamente</span>
+                </div>
+                <div class="voice-command-hint" id="voiceCommandHint" aria-live="polite">
+                    <span class="hint-icon" aria-hidden="true">🎤</span>
+                    <span class="hint-text">Diga "adicionar [item] [preço]" para adicionar por voz</span>
                 </div>
             </div>
         </main>
@@ -115,6 +198,325 @@
     <script type="module" src="app.js"></script>
     
     <script>
+        // ===== SISTEMA DE ACESSIBILIDADE =====
+        
+        // Configurações de Acessibilidade
+        let fontSize = 100;
+        let highContrast = false;
+        let voiceNavEnabled = false;
+        let screenReaderEnabled = false;
+        let recognition = null;
+        
+        // Inicializar Reconhecimento de Voz
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'pt-BR';
+            recognition.interimResults = false;
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                processVoiceCommand(transcript);
+            };
+            
+            recognition.onstart = () => {
+                document.getElementById('voiceFeedback').classList.remove('hidden');
+                announceToScreenReader('Ouvindo comando de voz');
+            };
+            
+            recognition.onend = () => {
+                document.getElementById('voiceFeedback').classList.add('hidden');
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Erro no reconhecimento:', event.error);
+                announceToScreenReader('Erro no reconhecimento de voz');
+                document.getElementById('voiceFeedback').classList.add('hidden');
+            };
+        }
+        
+        // Processar Comandos de Voz
+        function processVoiceCommand(command) {
+            const voiceText = document.getElementById('voiceText');
+            voiceText.textContent = `Comando: "${command}"`;
+            
+            // Feedback visual para surdos
+            showVisualFeedback(`Comando recebido: ${command}`);
+            
+            // Comando: adicionar [item] [preço]
+            if (command.includes('adicionar')) {
+                const match = command.match(/adicionar\s+(.+?)(?:\s+(\d+(?:[.,]\d{1,2})?))?$/);
+                if (match) {
+                    const itemName = match[1];
+                    const price = match[2] ? parseFloat(match[2].replace(',', '.')) : 0;
+                    
+                    document.getElementById('item').value = itemName;
+                    document.getElementById('itemPrice').value = price || '';
+                    
+                    adicionarItem();
+                    announceToScreenReader(`Item ${itemName} adicionado à lista`);
+                    showVisualFeedback(`✅ ${itemName} adicionado!`);
+                }
+            }
+            
+            // Comando: remover [item]
+            else if (command.includes('remover')) {
+                const match = command.match(/remover\s+(.+)/);
+                if (match) {
+                    const itemName = match[1];
+                    removerItemPorNome(itemName);
+                }
+            }
+            
+            // Comando: limpar lista
+            else if (command.includes('limpar lista')) {
+                if (confirm('Limpar toda a lista?')) {
+                    document.getElementById('lista').innerHTML = '';
+                    atualizarContador();
+                    calcularTotal();
+                }
+            }
+            
+            // Comando: total
+            else if (command.includes('total') || command.includes('quanto custa')) {
+                const total = document.getElementById('totalPrice').textContent;
+                announceToScreenReader(`O total da lista é ${total}`);
+                showVisualFeedback(`💰 Total: ${total}`);
+            }
+        }
+        
+        // Feedback Visual para Surdos
+        function showVisualFeedback(message) {
+            const feedback = document.createElement('div');
+            feedback.className = 'visual-feedback';
+            feedback.textContent = message;
+            feedback.setAttribute('role', 'alert');
+            feedback.setAttribute('aria-live', 'assertive');
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.classList.add('show');
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                    setTimeout(() => feedback.remove(), 300);
+                }, 3000);
+            }, 100);
+        }
+        
+        // Anunciar para Leitor de Tela
+        function announceToScreenReader(message) {
+            if (!screenReaderEnabled) return;
+            
+            const announcement = document.createElement('div');
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.className = 'sr-only';
+            announcement.textContent = message;
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => announcement.remove(), 1000);
+        }
+        
+        // Remover Item por Nome (Comando de Voz)
+        function removerItemPorNome(nome) {
+            const itens = document.querySelectorAll('.shopping-list li');
+            let encontrado = false;
+            
+            itens.forEach(item => {
+                const itemText = item.querySelector('.item-text').textContent.toLowerCase();
+                if (itemText.includes(nome.toLowerCase())) {
+                    item.classList.add('removing');
+                    setTimeout(() => {
+                        item.remove();
+                        atualizarContador();
+                        calcularTotal();
+                    }, 300);
+                    encontrado = true;
+                    announceToScreenReader(`Item ${itemText} removido`);
+                    showVisualFeedback(`🗑️ ${itemText} removido`);
+                }
+            });
+            
+            if (!encontrado) {
+                announceToScreenReader(`Item ${nome} não encontrado`);
+                showVisualFeedback(`❌ Item "${nome}" não encontrado`);
+            }
+        }
+        
+        // Toggle Navegação por Voz
+        function toggleVoiceNavigation() {
+            voiceNavEnabled = !voiceNavEnabled;
+            const btn = document.getElementById('voiceNavBtn');
+            
+            if (voiceNavEnabled) {
+                btn.classList.add('active');
+                recognition.start();
+                announceToScreenReader('Navegação por voz ativada');
+                showVisualFeedback('🎤 Navegação por voz ATIVADA');
+                
+                // Instruções para surdos
+                document.getElementById('voiceCommandHint').style.display = 'flex';
+            } else {
+                btn.classList.remove('active');
+                recognition.stop();
+                announceToScreenReader('Navegação por voz desativada');
+                document.getElementById('voiceCommandHint').style.display = 'none';
+            }
+        }
+        
+        // Toggle Alto Contraste
+        function toggleHighContrast() {
+            highContrast = !highContrast;
+            document.body.classList.toggle('high-contrast');
+            
+            const message = highContrast ? 'Alto contraste ativado' : 'Alto contraste desativado';
+            announceToScreenReader(message);
+            showVisualFeedback(highContraste ? '◐ Alto contraste ATIVADO' : '◐ Alto contraste DESATIVADO');
+        }
+        
+        // Aumentar Fonte
+        function increaseFontSize() {
+            fontSize = Math.min(fontSize + 10, 150);
+            document.documentElement.style.fontSize = fontSize + '%';
+            announceToScreenReader(`Tamanho da fonte: ${fontSize}%`);
+            showVisualFeedback(`A+ Fonte: ${fontSize}%`);
+        }
+        
+        // Diminuir Fonte
+        function decreaseFontSize() {
+            fontSize = Math.max(fontSize - 10, 70);
+            document.documentElement.style.fontSize = fontSize + '%';
+            announceToScreenReader(`Tamanho da fonte: ${fontSize}%`);
+            showVisualFeedback(`A- Fonte: ${fontSize}%`);
+        }
+        
+        // Toggle Leitor de Tela
+        function toggleScreenReader() {
+            screenReaderEnabled = !screenReaderEnabled;
+            const btn = document.getElementById('screenReaderBtn');
+            
+            if (screenReaderEnabled) {
+                btn.classList.add('active');
+                announceToScreenReader('Leitor de tela ativado');
+                showVisualFeedback('🔊 Leitor de tela ATIVADO');
+            } else {
+                btn.classList.remove('active');
+                showVisualFeedback('🔊 Leitor de tela DESATIVADO');
+            }
+        }
+        
+        // Modal de Libras
+        function openLibrasModal() {
+            document.getElementById('librasModal').classList.remove('hidden');
+            announceToScreenReader('Tradutor de Libras aberto');
+        }
+        
+        function closeLibrasModal() {
+            document.getElementById('librasModal').classList.add('hidden');
+        }
+        
+        // Traduzir para Libras (Simulação)
+        function translateToLibras() {
+            const input = document.getElementById('librasInput');
+            const word = input.value.trim();
+            
+            if (word) {
+                const librasVideo = document.getElementById('librasVideo');
+                librasVideo.innerHTML = `<span role="img" aria-label="Sinal de ${word} em Libras">🤟👐✋ ${word}</span>`;
+                showVisualFeedback(`🤟 Traduzindo "${word}" para Libras`);
+                announceToScreenReader(`Mostrando sinal de ${word} em Libras`);
+            }
+        }
+        
+        // ===== SISTEMA DE PREÇOS =====
+        
+        function calcularTotal() {
+            const itens = document.querySelectorAll('.shopping-list li');
+            let total = 0;
+            
+            itens.forEach(item => {
+                const price = parseFloat(item.dataset.price) || 0;
+                if (!item.querySelector('.item-checkbox.checked')) {
+                    total += price;
+                }
+            });
+            
+            document.getElementById('totalPrice').textContent = formatarMoeda(total);
+            
+            // Calcular economia estimada (itens já comprados)
+            let saved = 0;
+            itens.forEach(item => {
+                const price = parseFloat(item.dataset.price) || 0;
+                if (item.querySelector('.item-checkbox.checked')) {
+                    saved += price;
+                }
+            });
+            
+            document.getElementById('savedAmount').textContent = formatarMoeda(saved);
+        }
+        
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+        
+        // ===== INTEGRAÇÃO IFOOD =====
+        
+        function searchOnIfood() {
+            const itens = document.querySelectorAll('.shopping-list li:not([style*="display: none"]) .item-text');
+            const listaItens = Array.from(itens).map(item => item.textContent).join(', ');
+            
+            if (listaItens) {
+                const ifoodUrl = `https://www.ifood.com.br/busca?q=${encodeURIComponent(listaItens)}`;
+                
+                showVisualFeedback('🛵 Abrindo iFood com sua lista...');
+                announceToScreenReader('Buscando itens no iFood');
+                
+                // Feedback visual para surdos
+                const confirmDialog = document.createElement('div');
+                confirmDialog.className = 'ifood-confirm';
+                confirmDialog.innerHTML = `
+                    <p>Buscar estes itens no iFood?</p>
+                    <p class="ifood-items-preview">${listaItens.substring(0, 100)}...</p>
+                    <button onclick="window.open('${ifoodUrl}', '_blank')">Sim, abrir iFood</button>
+                    <button onclick="this.parentElement.remove()">Cancelar</button>
+                `;
+                document.body.appendChild(confirmDialog);
+                
+                setTimeout(() => confirmDialog.classList.add('show'), 100);
+            } else {
+                showVisualFeedback('❌ Adicione itens à lista primeiro');
+                announceToScreenReader('Lista vazia. Adicione itens primeiro.');
+            }
+        }
+        
+        // ===== FUNÇÕES AUXILIARES =====
+        
+        function atualizarContador() {
+            const lista = document.getElementById('lista');
+            const contador = document.getElementById('itemCount');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (lista && contador && emptyState) {
+                const qtdTotal = lista.children.length;
+                
+                if (qtdTotal === 0) {
+                    contador.textContent = '0 itens';
+                    emptyState.style.display = 'flex';
+                    lista.style.display = 'none';
+                } else {
+                    contador.textContent = `${qtdTotal} ${qtdTotal === 1 ? 'item' : 'itens'}`;
+                    emptyState.style.display = 'none';
+                    lista.style.display = 'block';
+                }
+                
+                calcularTotal();
+            }
+        }
+        
         // Detecção de Status Online/Offline
         let isOnline = navigator.onLine;
         const offlineIndicator = document.getElementById('offlineIndicator');
@@ -128,16 +530,13 @@
                 syncStatus.className = 'sync-status offline';
                 syncStatus.setAttribute('title', 'Offline - Alterações serão sincronizadas depois');
                 document.querySelector('.sync-icon').textContent = '📶';
+                announceToScreenReader('Você está offline');
             } else {
                 offlineIndicator.classList.add('hidden');
                 syncStatus.className = 'sync-status synced';
                 syncStatus.setAttribute('title', 'Online - Sincronizado');
                 document.querySelector('.sync-icon').textContent = '☁️';
-                
-                // Sincronizar dados pendentes quando voltar online
-                if (typeof window.sincronizarDadosPendentes === 'function') {
-                    window.sincronizarDadosPendentes();
-                }
+                announceToScreenReader('Conexão restaurada');
             }
         }
         
@@ -149,20 +548,7 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
-                        console.log('✅ ServiceWorker registrado:', registration.scope);
-                        
-                        // Verificar atualizações
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // Nova versão disponível
-                                    if (confirm('Nova versão disponível! Atualizar agora?')) {
-                                        window.location.reload();
-                                    }
-                                }
-                            });
-                        });
+                        console.log('✅ ServiceWorker registrado');
                     })
                     .catch(error => {
                         console.log('❌ Falha no ServiceWorker:', error);
@@ -170,7 +556,7 @@
             });
         }
 
-        // Melhoria UX: Adicionar item com Enter
+        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             updateOnlineStatus();
             
@@ -184,7 +570,7 @@
                 });
             }
             
-            // Carregar nome do usuário (exemplo)
+            // Carregar nome do usuário
             const userEmail = localStorage.getItem('userEmail') || 'Usuário';
             const userName = userEmail.split('@')[0];
             document.getElementById('userDisplayName').textContent = userName;
@@ -194,82 +580,17 @@
             document.getElementById('categoryFilter').addEventListener('change', (e) => {
                 filtrarPorCategoria(e.target.value);
             });
+            
+            // Anunciar carregamento completo
+            announceToScreenReader('Aplicação carregada. Use os controles de acessibilidade no topo da página.');
         });
-
-        // Sistema de Categorias
-        const categorias = {
-            hortifruti: { nome: 'Hortifruti', emoji: '🍎', cor: '#10b981', bgLight: 'rgba(16, 185, 129, 0.1)' },
-            laticinios: { nome: 'Laticínios', emoji: '🥛', cor: '#3b82f6', bgLight: 'rgba(59, 130, 246, 0.1)' },
-            carnes: { nome: 'Carnes', emoji: '🥩', cor: '#ef4444', bgLight: 'rgba(239, 68, 68, 0.1)' },
-            padaria: { nome: 'Padaria', emoji: '🍞', cor: '#f59e0b', bgLight: 'rgba(245, 158, 11, 0.1)' },
-            bebidas: { nome: 'Bebidas', emoji: '🥤', cor: '#06b6d4', bgLight: 'rgba(6, 182, 212, 0.1)' },
-            limpeza: { nome: 'Limpeza', emoji: '🧹', cor: '#8b5cf6', bgLight: 'rgba(139, 92, 246, 0.1)' },
-            higiene: { nome: 'Higiene', emoji: '🧴', cor: '#ec4899', bgLight: 'rgba(236, 72, 153, 0.1)' },
-            outros: { nome: 'Outros', emoji: '📦', cor: '#6b7280', bgLight: 'rgba(107, 114, 128, 0.1)' }
-        };
-
-        function filtrarPorCategoria(categoria) {
-            const itens = document.querySelectorAll('.shopping-list li');
-            itens.forEach(item => {
-                if (categoria === 'all' || item.dataset.categoria === categoria) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        // Função auxiliar para contador
-        function atualizarContador() {
-            const lista = document.getElementById('lista');
-            const contador = document.getElementById('itemCount');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (lista && contador && emptyState) {
-                const itensVisiveis = Array.from(lista.children).filter(li => li.style.display !== 'none');
-                const qtdItens = itensVisiveis.length;
-                const qtdTotal = lista.children.length;
-                
-                if (qtdTotal === 0) {
-                    contador.textContent = '0 itens';
-                    emptyState.style.display = 'flex';
-                    lista.style.display = 'none';
-                } else {
-                    contador.textContent = `${qtdTotal} ${qtdTotal === 1 ? 'item' : 'itens'}`;
-                    emptyState.style.display = 'none';
-                    lista.style.display = 'block';
-                }
+        
+        // Fechar modal com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeLibrasModal();
             }
-        }
-
-        // Sincronização de Status
-        window.sincronizarDadosPendentes = function() {
-            const pendingChanges = JSON.parse(localStorage.getItem('pendingChanges') || '[]');
-            
-            if (pendingChanges.length > 0) {
-                syncStatus.className = 'sync-status syncing';
-                document.querySelector('.sync-icon').textContent = '🔄';
-                
-                // Processar mudanças pendentes
-                Promise.all(pendingChanges.map(change => {
-                    return fetch('/api/sync', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(change)
-                    });
-                }))
-                .then(() => {
-                    localStorage.setItem('pendingChanges', '[]');
-                    syncStatus.className = 'sync-status synced';
-                    document.querySelector('.sync-icon').textContent = '☁️';
-                })
-                .catch(error => {
-                    console.error('Erro na sincronização:', error);
-                    syncStatus.className = 'sync-status error';
-                    document.querySelector('.sync-icon').textContent = '⚠️';
-                });
-            }
-        };
+        });
     </script>
 </body>
 </html>
