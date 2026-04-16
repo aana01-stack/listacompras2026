@@ -1,38 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="src/css/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Minha Lista | 2026</title>
     <link rel="manifest" href="manifest.json">
-    <title>Lista 2026</title>
     <link rel="shortcut icon" href="src/css/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="src/css/index.css">
 </head>
 <body>
-    <div class="container">
-        <h2 class="titulo">Minha lista de compras</h2>
-        <button onclick="logout()">Sair</button>
-        <ul id="lista"></ul>
-        <input type="text" id="item" placeholder="Novo Item">
-        <button onclick="adicionarItem()">Adicionar</button>
+    <div class="app-wrapper">
+        <!-- Header Glass -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="user-greeting">
+                    <div class="avatar">👤</div>
+                    <div class="greeting-text">
+                        <span class="greeting-label">Olá,</span>
+                        <span class="user-name" id="userDisplayName">Usuário</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()" aria-label="Sair da conta">
+                    <span class="logout-icon">🚪</span>
+                    <span class="logout-text">Sair</span>
+                </button>
+            </div>
+            <h1 class="page-title">
+                <span class="title-icon">🛒</span>
+                Minha Lista de Compras
+            </h1>
+        </header>
+
+        <!-- Container Principal -->
+        <main class="main-content">
+            <!-- Área da Lista -->
+            <div class="list-container">
+                <div class="list-header">
+                    <h2 class="section-title">Itens da Lista</h2>
+                    <span class="item-count" id="itemCount">0 itens</span>
+                </div>
+                
+                <ul id="lista" class="shopping-list">
+                    <!-- Itens serão inseridos via JS -->
+                </ul>
+
+                <!-- Empty State (oculto por padrão) -->
+                <div id="emptyState" class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <h3>Sua lista está vazia</h3>
+                    <p>Adicione itens para começar suas compras</p>
+                </div>
+            </div>
+
+            <!-- Área de Adição -->
+            <div class="add-section">
+                <div class="add-container">
+                    <input 
+                        type="text" 
+                        id="item" 
+                        placeholder="O que você precisa comprar?"
+                        autocomplete="off"
+                        aria-label="Novo item para adicionar à lista"
+                    >
+                    <button onclick="adicionarItem()" class="add-btn" aria-label="Adicionar item">
+                        <span class="add-icon">+</span>
+                        <span class="add-text">Adicionar</span>
+                    </button>
+                </div>
+                <div class="input-hint">
+                    <span class="hint-icon">💡</span>
+                    <span class="hint-text">Pressione Enter para adicionar rapidamente</span>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script type="module" src="app.js"></script>
     
-<script>
+    <script>
+        // Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
-                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
+                        console.log('✅ ServiceWorker registrado:', registration.scope);
                     })
                     .catch(error => {
-                        console.log('Falha ao registrar o ServiceWorker:', error);
+                        console.log('❌ Falha no ServiceWorker:', error);
                     });
             });
         }
-    </script>
 
-    
+        // Melhoria UX: Adicionar item com Enter
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputItem = document.getElementById('item');
+            if (inputItem) {
+                inputItem.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        adicionarItem();
+                    }
+                });
+            }
+            
+            // Atualizar contador de itens (será complementado pelo app.js)
+            atualizarContador();
+        });
+
+        // Função auxiliar para contador (complementar ao app.js existente)
+        function atualizarContador() {
+            const lista = document.getElementById('lista');
+            const contador = document.getElementById('itemCount');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (lista && contador && emptyState) {
+                const qtdItens = lista.children.length;
+                contador.textContent = `${qtdItens} ${qtdItens === 1 ? 'item' : 'itens'}`;
+                
+                // Mostrar/esconder empty state
+                if (qtdItens === 0) {
+                    emptyState.style.display = 'flex';
+                    lista.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    lista.style.display = 'block';
+                }
+            }
+        }
+    </script>
 </body>
 </html>
