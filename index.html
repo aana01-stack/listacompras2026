@@ -2,274 +2,224 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Minha Lista | 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#361134">
+    <meta name="description" content="Lista de Compras 2026 - Gerencie sua lista compartilhada">
+    <title>Lista 2026 - Minha Lista de Compras</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="src/css/icons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="src/css/icons/Favicon-512.png">
+    
+    <!-- Manifest PWA -->
     <link rel="manifest" href="manifest.json">
-    <link rel="shortcut icon" href="src/css/img/favicon.ico" type="image/x-icon">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/index.css">
 </head>
 <body>
-    <!-- Indicador de Status Offline -->
-    <div id="offlineIndicator" class="offline-indicator hidden">
-        <span class="offline-icon">📡</span>
-        <span class="offline-text">Você está offline</span>
-        <span class="offline-subtext">Alterações serão sincronizadas quando conectar</span>
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay" aria-hidden="true" hidden>
+        <div class="loader-spinner"></div>
+        <p class="loader-text">Carregando...</p>
     </div>
 
-    <div class="app-wrapper">
-        <!-- Header Glass -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="user-greeting">
-                    <div class="avatar" id="userAvatar">👤</div>
-                    <div class="greeting-text">
-                        <span class="greeting-label">Olá,</span>
-                        <span class="user-name" id="userDisplayName">Usuário</span>
-                    </div>
-                </div>
-                <div class="header-actions">
-                    <div id="syncStatus" class="sync-status synced" title="Sincronizado">
-                        <span class="sync-icon">☁️</span>
-                    </div>
-                    <button class="logout-btn" onclick="logout()" aria-label="Sair da conta">
-                        <span class="logout-icon">🚪</span>
-                        <span class="logout-text">Sair</span>
-                    </button>
+    <!-- Container Principal -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="user-info">
+                <i class="fas fa-user-circle user-avatar"></i>
+                <div class="user-details">
+                    <span id="user-name" class="user-name">Usuário</span>
+                    <span id="user-email" class="user-email">email@exemplo.com</span>
                 </div>
             </div>
-            <h1 class="page-title">
-                <span class="title-icon">🛒</span>
-                Minha Lista de Compras
-            </h1>
+            
+            <div class="header-actions">
+                <button onclick="compartilharLista()" class="btn-icon" aria-label="Compartilhar lista" title="Compartilhar">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+                <button onclick="logout()" class="btn-logout" aria-label="Sair da conta" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </button>
+            </div>
         </header>
 
-        <!-- Container Principal -->
-        <main class="main-content">
-            <!-- Área da Lista -->
-            <div class="list-container">
-                <div class="list-header">
-                    <h2 class="section-title">Itens da Lista</h2>
-                    <div class="list-stats">
-                        <span class="item-count" id="itemCount">0 itens</span>
-                        <select id="categoryFilter" class="category-filter" aria-label="Filtrar por categoria">
-                            <option value="all">Todas categorias</option>
-                            <option value="hortifruti">🍎 Hortifruti</option>
-                            <option value="laticinios">🥛 Laticínios</option>
-                            <option value="carnes">🥩 Carnes</option>
-                            <option value="padaria">🍞 Padaria</option>
-                            <option value="bebidas">🥤 Bebidas</option>
-                            <option value="limpeza">🧹 Limpeza</option>
-                            <option value="higiene">🧴 Higiene</option>
-                            <option value="outros">📦 Outros</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <ul id="lista" class="shopping-list">
-                    <!-- Itens serão inseridos via JS -->
-                </ul>
+        <!-- Título -->
+        <div class="title-section">
+            <h1 class="titulo">
+                <i class="fas fa-shopping-cart"></i>
+                Minha Lista de Compras
+            </h1>
+            <p id="data-atualizacao" class="update-date"></p>
+        </div>
 
-                <!-- Empty State -->
-                <div id="emptyState" class="empty-state">
-                    <div class="empty-icon">📝</div>
-                    <h3>Sua lista está vazia</h3>
-                    <p>Adicione itens para começar suas compras</p>
-                </div>
+        <!-- Estatísticas Rápidas -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span id="total-itens" class="stat-number">0</span>
+                <span class="stat-label">Itens</span>
             </div>
+            <div class="stat-item">
+                <span id="itens-comprados" class="stat-number">0</span>
+                <span class="stat-label">Comprados</span>
+            </div>
+            <div class="stat-item">
+                <span id="categorias-count" class="stat-number">0</span>
+                <span class="stat-label">Categorias</span>
+            </div>
+        </div>
 
-            <!-- Área de Adição -->
-            <div class="add-section">
-                <div class="add-container">
-                    <div class="input-wrapper">
-                        <input 
-                            type="text" 
-                            id="item" 
-                            placeholder="O que você precisa comprar?"
-                            autocomplete="off"
-                            aria-label="Novo item para adicionar à lista"
-                        >
-                        <select id="itemCategory" class="item-category-select" aria-label="Categoria do item">
-                            <option value="hortifruti">🍎</option>
-                            <option value="laticinios">🥛</option>
-                            <option value="carnes">🥩</option>
-                            <option value="padaria">🍞</option>
-                            <option value="bebidas">🥤</option>
-                            <option value="limpeza">🧹</option>
-                            <option value="higiene">🧴</option>
-                            <option value="outros" selected>📦</option>
-                        </select>
-                    </div>
-                    <button onclick="adicionarItem()" class="add-btn" aria-label="Adicionar item">
-                        <span class="add-icon">+</span>
-                        <span class="add-text">Adicionar</span>
-                    </button>
-                </div>
-                <div class="input-hint">
-                    <span class="hint-icon">💡</span>
-                    <span class="hint-text">Pressione Enter para adicionar rapidamente</span>
-                </div>
+        <!-- Barra de Pesquisa e Filtros -->
+        <div class="search-filter-bar">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       id="pesquisa" 
+                       placeholder="Pesquisar itens..."
+                       aria-label="Pesquisar itens da lista"
+                       oninput="filtrarItens()">
+                <button onclick="limparPesquisa()" class="clear-search" aria-label="Limpar pesquisa" hidden>
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </main>
+            <div class="filter-buttons">
+                <button onclick="filtrarPorCategoria('todos')" class="filter-btn active" data-filter="todos">
+                    Todos
+                </button>
+                <button onclick="filtrarPorCategoria('pendentes')" class="filter-btn" data-filter="pendentes">
+                    Pendentes
+                </button>
+                <button onclick="filtrarPorCategoria('comprados')" class="filter-btn" data-filter="comprados">
+                    Comprados
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de Compras -->
+        <div id="lista-container" class="lista-container">
+            <ul id="lista" class="shopping-list" role="list" aria-label="Lista de compras">
+                <!-- Itens serão inseridos dinamicamente -->
+            </ul>
+            
+            <!-- Estado Vazio -->
+            <div id="empty-state" class="empty-state" hidden>
+                <i class="fas fa-shopping-basket empty-icon"></i>
+                <h3>Sua lista está vazia</h3>
+                <p>Adicione itens para começar suas compras!</p>
+            </div>
+        </div>
+
+        <!-- Adicionar Item -->
+        <div class="add-item-section">
+            <div class="add-item-form">
+                <input type="text" 
+                       id="item" 
+                       placeholder="O que você precisa comprar?"
+                       aria-label="Nome do novo item"
+                       autocomplete="off">
+                <select id="categoria" aria-label="Categoria do item" class="categoria-select">
+                    <option value="auto">Auto classificar</option>
+                    <option value="carnes">🥩 Carnes</option>
+                    <option value="vegetais">🥬 Vegetais</option>
+                    <option value="frutas">🍎 Frutas</option>
+                    <option value="laticinios">🧀 Laticínios</option>
+                    <option value="padaria">🍞 Padaria</option>
+                    <option value="bebidas">🥤 Bebidas</option>
+                    <option value="limpeza">🧹 Limpeza</option>
+                    <option value="higiene">🧴 Higiene</option>
+                    <option value="enlatados">🥫 Enlatados</option>
+                    <option value="graos">🌾 Grãos</option>
+                    <option value="temperos">🌶️ Temperos</option>
+                    <option value="outros">📦 Outros</option>
+                </select>
+                <div class="quantidade-control">
+                    <button onclick="alterarQuantidade(-1)" class="qty-btn" aria-label="Diminuir quantidade">-</button>
+                    <input type="number" id="quantidade" value="1" min="1" max="99" aria-label="Quantidade">
+                    <button onclick="alterarQuantidade(1)" class="qty-btn" aria-label="Aumentar quantidade">+</button>
+                </div>
+                <button onclick="adicionarItem()" class="btn-add" aria-label="Adicionar item à lista">
+                    <i class="fas fa-plus"></i>
+                    Adicionar
+                </button>
+            </div>
+            
+            <!-- Sugestões Rápidas -->
+            <div class="quick-suggestions">
+                <span class="suggestion-label">Sugestões:</span>
+                <button onclick="adicionarSugestao('Arroz')" class="suggestion-chip">Arroz</button>
+                <button onclick="adicionarSugestao('Feijão')" class="suggestion-chip">Feijão</button>
+                <button onclick="adicionarSugestao('Leite')" class="suggestion-chip">Leite</button>
+                <button onclick="adicionarSugestao('Pão')" class="suggestion-chip">Pão</button>
+                <button onclick="adicionarSugestao('Ovos')" class="suggestion-chip">Ovos</button>
+            </div>
+        </div>
     </div>
 
+    <!-- Scripts -->
     <script type="module" src="app.js"></script>
     
     <script>
-        // Detecção de Status Online/Offline
-        let isOnline = navigator.onLine;
-        const offlineIndicator = document.getElementById('offlineIndicator');
-        const syncStatus = document.getElementById('syncStatus');
-        
-        function updateOnlineStatus() {
-            isOnline = navigator.onLine;
-            
-            if (!isOnline) {
-                offlineIndicator.classList.remove('hidden');
-                syncStatus.className = 'sync-status offline';
-                syncStatus.setAttribute('title', 'Offline - Alterações serão sincronizadas depois');
-                document.querySelector('.sync-icon').textContent = '📶';
-            } else {
-                offlineIndicator.classList.add('hidden');
-                syncStatus.className = 'sync-status synced';
-                syncStatus.setAttribute('title', 'Online - Sincronizado');
-                document.querySelector('.sync-icon').textContent = '☁️';
-                
-                // Sincronizar dados pendentes quando voltar online
-                if (typeof window.sincronizarDadosPendentes === 'function') {
-                    window.sincronizarDadosPendentes();
-                }
-            }
-        }
-        
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        
-        // Service Worker
+        // Registro do Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
-                        console.log('✅ ServiceWorker registrado:', registration.scope);
-                        
-                        // Verificar atualizações
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // Nova versão disponível
-                                    if (confirm('Nova versão disponível! Atualizar agora?')) {
-                                        window.location.reload();
-                                    }
-                                }
-                            });
-                        });
+                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
                     })
                     .catch(error => {
-                        console.log('❌ Falha no ServiceWorker:', error);
+                        console.log('Falha ao registrar o ServiceWorker:', error);
                     });
             });
         }
 
-        // Melhoria UX: Adicionar item com Enter
-        document.addEventListener('DOMContentLoaded', () => {
-            updateOnlineStatus();
-            
-            const inputItem = document.getElementById('item');
-            if (inputItem) {
-                inputItem.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        adicionarItem();
-                    }
-                });
-            }
-            
-            // Carregar nome do usuário (exemplo)
-            const userEmail = localStorage.getItem('userEmail') || 'Usuário';
-            const userName = userEmail.split('@')[0];
-            document.getElementById('userDisplayName').textContent = userName;
-            document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase() + '👤';
-            
-            // Inicializar filtro de categorias
-            document.getElementById('categoryFilter').addEventListener('change', (e) => {
-                filtrarPorCategoria(e.target.value);
-            });
-        });
-
-        // Sistema de Categorias
-        const categorias = {
-            hortifruti: { nome: 'Hortifruti', emoji: '🍎', cor: '#10b981', bgLight: 'rgba(16, 185, 129, 0.1)' },
-            laticinios: { nome: 'Laticínios', emoji: '🥛', cor: '#3b82f6', bgLight: 'rgba(59, 130, 246, 0.1)' },
-            carnes: { nome: 'Carnes', emoji: '🥩', cor: '#ef4444', bgLight: 'rgba(239, 68, 68, 0.1)' },
-            padaria: { nome: 'Padaria', emoji: '🍞', cor: '#f59e0b', bgLight: 'rgba(245, 158, 11, 0.1)' },
-            bebidas: { nome: 'Bebidas', emoji: '🥤', cor: '#06b6d4', bgLight: 'rgba(6, 182, 212, 0.1)' },
-            limpeza: { nome: 'Limpeza', emoji: '🧹', cor: '#8b5cf6', bgLight: 'rgba(139, 92, 246, 0.1)' },
-            higiene: { nome: 'Higiene', emoji: '🧴', cor: '#ec4899', bgLight: 'rgba(236, 72, 153, 0.1)' },
-            outros: { nome: 'Outros', emoji: '📦', cor: '#6b7280', bgLight: 'rgba(107, 114, 128, 0.1)' }
-        };
-
-        function filtrarPorCategoria(categoria) {
-            const itens = document.querySelectorAll('.shopping-list li');
-            itens.forEach(item => {
-                if (categoria === 'all' || item.dataset.categoria === categoria) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        // Função auxiliar para contador
-        function atualizarContador() {
-            const lista = document.getElementById('lista');
-            const contador = document.getElementById('itemCount');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (lista && contador && emptyState) {
-                const itensVisiveis = Array.from(lista.children).filter(li => li.style.display !== 'none');
-                const qtdItens = itensVisiveis.length;
-                const qtdTotal = lista.children.length;
+        // Função de Logout
+        function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                // Limpar dados da sessão
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userData');
+                sessionStorage.clear();
                 
-                if (qtdTotal === 0) {
-                    contador.textContent = '0 itens';
-                    emptyState.style.display = 'flex';
-                    lista.style.display = 'none';
-                } else {
-                    contador.textContent = `${qtdTotal} ${qtdTotal === 1 ? 'item' : 'itens'}`;
-                    emptyState.style.display = 'none';
-                    lista.style.display = 'block';
-                }
+                // Redirecionar para login
+                window.location.href = 'login.html';
             }
         }
 
-        // Sincronização de Status
-        window.sincronizarDadosPendentes = function() {
-            const pendingChanges = JSON.parse(localStorage.getItem('pendingChanges') || '[]');
-            
-            if (pendingChanges.length > 0) {
-                syncStatus.className = 'sync-status syncing';
-                document.querySelector('.sync-icon').textContent = '🔄';
-                
-                // Processar mudanças pendentes
-                Promise.all(pendingChanges.map(change => {
-                    return fetch('/api/sync', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(change)
-                    });
-                }))
-                .then(() => {
-                    localStorage.setItem('pendingChanges', '[]');
-                    syncStatus.className = 'sync-status synced';
-                    document.querySelector('.sync-icon').textContent = '☁️';
-                })
-                .catch(error => {
-                    console.error('Erro na sincronização:', error);
-                    syncStatus.className = 'sync-status error';
-                    document.querySelector('.sync-icon').textContent = '⚠️';
-                });
+        // Funções auxiliares
+        function compartilharLista() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Minha Lista de Compras',
+                    text: 'Veja minha lista de compras!',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                alert('Compartilhamento não suportado neste navegador');
             }
-        };
+        }
+
+        function alterarQuantidade(delta) {
+            const qtyInput = document.getElementById('quantidade');
+            let value = parseInt(qtyInput.value) + delta;
+            qtyInput.value = Math.max(1, Math.min(99, value));
+        }
+
+        function limparPesquisa() {
+            document.getElementById('pesquisa').value = '';
+            filtrarItens();
+        }
+
+        function adicionarSugestao(item) {
+            document.getElementById('item').value = item;
+            document.getElementById('quantidade').value = 1;
+            adicionarItem();
+        }
     </script>
 </body>
 </html>
