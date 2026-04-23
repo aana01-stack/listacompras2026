@@ -2,53 +2,207 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Login | Lista de Compras 2026</title>
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#361134">
+    <meta name="description" content="Lista de Compras 2026 - Acesso seguro à sua lista compartilhada">
+    <title>Lista De Compras 2026 - Login</title>
+    
+    <!-- Favicon -->
     <link rel="shortcut icon" href="src/css/icons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="src/css/icons/Favicon-512.png">
+    
+    <!-- Manifest PWA -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Font Awesome para ícones sociais -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/login.css">
-    <!-- Fonte Poppins já está no CSS -->
 </head>
 <body>
-    <div class="login-container">
-        <div class="glass-card">
-            <div class="logo-wrapper">
-                <img src="src/css/icons/Favicon-512.png" alt="Logo Lista 2026" id="logo">
-            </div>
-            
-            <div class="header-text">
-                <h1 class="titulo">Bem-vindo de volta</h1>
-                <p class="subtitulo">Entre para sincronizar suas listas</p>
-            </div>
+    <!-- Indicador de Carregamento -->
+    <div id="loader" class="loader-overlay" aria-hidden="true">
+        <div class="loader-spinner"></div>
+        <p class="loader-text">Carregando...</p>
+    </div>
 
-            <form id="login-form" onsubmit="event.preventDefault(); login();">
-                <div class="input-group">
-                    <input type="email" id="email" name="email" required placeholder=" ">
-                    <label for="email">E-mail</label>
-                    <span class="input-icon">📧</span>
-                </div>
-
-                <div class="input-group">
-                    <input type="password" id="senha" name="senha" required placeholder=" ">
-                    <label for="senha">Senha</label>
-                    <span class="input-icon">🔒</span>
-                </div>
-
-                <button type="submit" class="btn-primary">Entrar</button>
-                
-                <div class="separator">
-                    <span>ou</span>
-                </div>
-
-                <button type="button" class="btn-secondary" onclick="cadastro()">Criar uma conta gratuita</button>
-            </form>
+    <!-- Menu de Acessibilidade -->
+    <div class="accessibility-menu" role="region" aria-label="Menu de acessibilidade">
+        <button class="accessibility-toggle" aria-label="Abrir menu de acessibilidade" aria-expanded="false">
+            <i class="fas fa-universal-access"></i>
+        </button>
+        <div class="accessibility-options">
+            <button onclick="toggleHighContrast()" aria-label="Ativar alto contraste" title="Alto Contraste">
+                <i class="fas fa-adjust"></i>
+                <span>Alto Contraste</span>
+            </button>
+            <button onclick="increaseFontSize()" aria-label="Aumentar tamanho da fonte" title="Aumentar Fonte">
+                <i class="fas fa-font"></i>+
+            </button>
+            <button onclick="decreaseFontSize()" aria-label="Diminuir tamanho da fonte" title="Diminuir Fonte">
+                <i class="fas fa-font"></i>-
+            </button>
+            <button onclick="resetFontSize()" aria-label="Restaurar tamanho da fonte" title="Fonte Normal">
+                <i class="fas fa-undo"></i>
+            </button>
+            <button onclick="toggleVLibras()" aria-label="Ativar/Desativar VLibras" title="Libras">
+                <i class="fas fa-hands"></i>
+                <span>Libras</span>
+            </button>
         </div>
     </div>
 
-    <script type="module" src="auth.js"></script>
+    <!-- Container Principal -->
+    <div class="container" role="main" aria-labelledby="login-heading">
+        <div class="login-card">
+            <!-- Logo Animada -->
+            <div class="logo-container">
+                <img src="src/css/icons/Favicon-512.png" 
+                     alt="Logo Lista de Compras 2026" 
+                     id="logo"
+                     class="logo-pulse">
+            </div>
+            
+            <!-- Título -->
+            <h1 id="login-heading" class="titulo">Bem-vindo de volta!</h1>
+            <p class="subtitulo">Faça login para acessar sua lista compartilhada</p>
+            
+            <!-- Feedback de Erro -->
+            <div id="error-message" class="error-message" role="alert" aria-live="polite" hidden>
+                <i class="fas fa-exclamation-circle"></i>
+                <span></span>
+            </div>
+            
+            <!-- Feedback de Sucesso -->
+            <div id="success-message" class="success-message" role="status" aria-live="polite" hidden>
+                <i class="fas fa-check-circle"></i>
+                <span></span>
+            </div>
 
+            <!-- Formulário de Login -->
+            <form id="login-form" class="login-form" novalidate>
+                <!-- Campo Email -->
+                <div class="input-group">
+                    <label for="email" class="floating-label">E-mail</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" 
+                               id="email" 
+                               name="email"
+                               placeholder="seu@email.com"
+                               required
+                               autocomplete="email"
+                               aria-required="true"
+                               aria-describedby="email-help">
+                        <button type="button" 
+                                class="clear-input" 
+                                aria-label="Limpar campo email"
+                                onclick="clearInput('email')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <span id="email-help" class="help-text" role="alert"></span>
+                </div>
+
+                <!-- Campo Senha -->
+                <div class="input-group">
+                    <label for="senha" class="floating-label">Senha</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" 
+                               id="senha" 
+                               name="senha"
+                               placeholder="Sua senha"
+                               required
+                               autocomplete="current-password"
+                               aria-required="true"
+                               aria-describedby="senha-help">
+                        <button type="button" 
+                                class="toggle-password" 
+                                aria-label="Mostrar/ocultar senha"
+                                onclick="togglePasswordVisibility()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span id="senha-help" class="help-text" role="alert"></span>
+                </div>
+
+                <!-- Opções Adicionais -->
+                <div class="form-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="remember-me" name="remember-me">
+                        <span class="checkmark"></span>
+                        Lembrar-me
+                    </label>
+                    <a href="#" class="forgot-password" onclick="showForgotPassword()" 
+                       aria-label="Recuperar senha esquecida">
+                        Esqueceu a senha?
+                    </a>
+                </div>
+
+                <!-- Botão de Login -->
+                <button type="submit" 
+                        id="login-button"
+                        class="btn-primary"
+                        aria-label="Entrar na sua conta">
+                    <span class="btn-text">Entrar</span>
+                    <span class="btn-loader" hidden>
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+            </form>
+
+            <!-- Separador -->
+            <div class="divider">
+                <span>ou continue com</span>
+            </div>
+
+            <!-- Login Social -->
+            <div class="social-login">
+                <button onclick="loginWithGoogle()" class="social-btn google-btn" 
+                        aria-label="Entrar com Google">
+                    <i class="fab fa-google"></i>
+                    <span>Google</span>
+                </button>
+                <button onclick="loginWithFacebook()" class="social-btn facebook-btn" 
+                        aria-label="Entrar com Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </button>
+                <button onclick="loginWithApple()" class="social-btn apple-btn" 
+                        aria-label="Entrar com Apple">
+                    <i class="fab fa-apple"></i>
+                    <span>Apple</span>
+                </button>
+            </div>
+
+            <!-- Link para Cadastro -->
+            <p class="register-link">
+                Não tem uma conta? 
+                <a href="#" onclick="cadastro()" aria-label="Criar nova conta">
+                    Cadastre-se gratuitamente
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Widget VLibras -->
+    <div id="vlibras-container" class="vlibras-container" hidden>
+        <div vw class="enabled">
+            <div vw-access-button class="active"></div>
+            <div vw-plugin-wrapper>
+                <div class="vw-plugin-top-wrapper"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script type="module" src="auth.js"></script>
+    
     <script>
-        // Service Worker (Mantido igual)
+        // Registro do Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
@@ -60,6 +214,60 @@
                     });
             });
         }
+
+        // Inicialização do VLibras
+        let vlibrasInitialized = false;
+        let fontScale = 1;
+
+        function toggleVLibras() {
+            const container = document.getElementById('vlibras-container');
+            
+            if (!vlibrasInitialized) {
+                new window.VLibras.Widget('https://vlibras.gov.br/app');
+                container.hidden = false;
+                vlibrasInitialized = true;
+            } else {
+                container.hidden = !container.hidden;
+            }
+        }
+
+        // Funções de Acessibilidade
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function increaseFontSize() {
+            fontScale = Math.min(fontScale + 0.1, 1.5);
+            document.documentElement.style.fontSize = `${fontScale}rem`;
+        }
+
+        function decreaseFontSize() {
+            fontScale = Math.max(fontScale - 0.1, 0.8);
+            document.documentElement.style.fontSize = `${fontScale}rem`;
+        }
+
+        function resetFontSize() {
+            fontScale = 1;
+            document.documentElement.style.fontSize = '';
+        }
+
+        // Toggle menu acessibilidade
+        document.querySelector('.accessibility-toggle').addEventListener('click', function() {
+            const options = document.querySelector('.accessibility-options');
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            
+            this.setAttribute('aria-expanded', !isExpanded);
+            options.classList.toggle('show');
+        });
+
+        // Fechar menu ao clicar fora
+        document.addEventListener('click', function(e) {
+            const menu = document.querySelector('.accessibility-menu');
+            if (!menu.contains(e.target)) {
+                document.querySelector('.accessibility-options').classList.remove('show');
+                document.querySelector('.accessibility-toggle').setAttribute('aria-expanded', 'false');
+            }
+        });
     </script>
 </body>
 </html>
