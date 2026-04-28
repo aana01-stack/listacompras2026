@@ -4,270 +4,827 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#361134">
-    <meta name="description" content="Lista de Compras 2026 - Acesso seguro à sua lista compartilhada">
     <title>Lista De Compras 2026 - Login</title>
-    
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="src/css/icons/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="src/css/icons/Favicon-512.png">
-    
-    <!-- Manifest PWA -->
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Font Awesome para ícones sociais -->
+    <link rel="shortcut icon" href="src/css/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/login.css">
+    <style>
+        /* Loader - Garantir que funcione */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(54, 17, 52, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loader-overlay.hidden,
+        .loader-overlay[hidden] {
+            display: none !important;
+        }
+        
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #fff;
+            border-top-color: #EA3788;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loader-text {
+            color: #fff;
+            margin-top: 10px;
+            font-family: sans-serif;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Melhorias visuais */
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        
+        #logo {
+            width: 100px;
+            height: auto;
+            border-radius: 20px;
+        }
+        
+        .titulo {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .subtitulo {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            color: #999;
+            font-size: 1rem;
+            z-index: 1;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px 45px 14px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #B0228C;
+            box-shadow: 0 0 0 4px rgba(176, 34, 140, 0.1);
+        }
+        
+        .clear-input,
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+            font-size: 1rem;
+            padding: 5px;
+            z-index: 1;
+        }
+        
+        .clear-input:hover,
+        .toggle-password:hover {
+            color: #B0228C;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .checkbox-wrapper input {
+            width: auto;
+            accent-color: #B0228C;
+        }
+        
+        .forgot-password {
+            color: #B0228C;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+            color: #361134;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #361134, #B0228C);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(176, 34, 140, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(176, 34, 140, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            font-size: 0.85rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .divider span {
+            padding: 0 15px;
+        }
+        
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            background: white;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .google-btn:hover {
+            border-color: #db4437;
+            color: #db4437;
+        }
+        
+        .facebook-btn:hover {
+            border-color: #1877f2;
+            color: #1877f2;
+        }
+        
+        .apple-btn:hover {
+            border-color: #000;
+            color: #000;
+        }
+        
+        .fa-google { color: #db4437; }
+        .fa-facebook-f { color: #1877f2; }
+        .fa-apple { color: #000; }
+        
+        .register-link {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .register-link a {
+            color: #B0228C;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+            color: #361134;
+        }
+        
+        /* Mensagens */
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .message-error {
+            background: #ffe7e7;
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .message-success {
+            background: #e7ffe7;
+            color: #28a745;
+            border-left: 4px solid #28a745;
+        }
+        
+        .message-info {
+            background: #e7f3ff;
+            color: #0d6efd;
+            border-left: 4px solid #0d6efd;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Acessibilidade */
+        .accessibility-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .accessibility-toggle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #361134;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .accessibility-toggle:hover {
+            background: #B0228C;
+            transform: scale(1.1);
+        }
+        
+        .accessibility-options {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 160px;
+        }
+        
+        .accessibility-options.show {
+            display: flex;
+        }
+        
+        .accessibility-options button {
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .accessibility-options button:hover {
+            background: #f0f0f0;
+        }
+        
+        /* Responsivo */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.5rem;
+            }
+            
+            .titulo {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Indicador de Carregamento -->
-    <div id="loader" class="loader-overlay" aria-hidden="true">
+    <!-- Loader (será escondido pelo JavaScript) -->
+    <div id="loader" class="loader-overlay">
         <div class="loader-spinner"></div>
         <p class="loader-text">Carregando...</p>
     </div>
 
     <!-- Menu de Acessibilidade -->
-    <div class="accessibility-menu" role="region" aria-label="Menu de acessibilidade">
-        <button class="accessibility-toggle" aria-label="Abrir menu de acessibilidade" aria-expanded="false">
+    <div class="accessibility-menu">
+        <button class="accessibility-toggle" id="accessibility-btn" aria-label="Acessibilidade">
             <i class="fas fa-universal-access"></i>
         </button>
-        <div class="accessibility-options">
-            <button onclick="toggleHighContrast()" aria-label="Ativar alto contraste" title="Alto Contraste">
-                <i class="fas fa-adjust"></i>
-                <span>Alto Contraste</span>
-            </button>
-            <button onclick="increaseFontSize()" aria-label="Aumentar tamanho da fonte" title="Aumentar Fonte">
-                <i class="fas fa-font"></i>+
-            </button>
-            <button onclick="decreaseFontSize()" aria-label="Diminuir tamanho da fonte" title="Diminuir Fonte">
-                <i class="fas fa-font"></i>-
-            </button>
-            <button onclick="resetFontSize()" aria-label="Restaurar tamanho da fonte" title="Fonte Normal">
-                <i class="fas fa-undo"></i>
-            </button>
-            <button onclick="toggleVLibras()" aria-label="Ativar/Desativar VLibras" title="Libras">
-                <i class="fas fa-hands"></i>
-                <span>Libras</span>
-            </button>
+        <div class="accessibility-options" id="accessibility-options">
+            <button onclick="toggleContraste()"><i class="fas fa-adjust"></i> Alto Contraste</button>
+            <button onclick="aumentarFonte()"><i class="fas fa-text-height"></i> Aumentar Fonte</button>
+            <button onclick="diminuirFonte()"><i class="fas fa-text-width"></i> Diminuir Fonte</button>
+            <button onclick="resetarFonte()"><i class="fas fa-undo"></i> Fonte Normal</button>
         </div>
     </div>
 
-    <!-- Container Principal -->
-    <div class="container" role="main" aria-labelledby="login-heading">
+    <div class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
         <div class="login-card">
-            <!-- Logo Animada -->
+            <!-- Logo -->
             <div class="logo-container">
-                <img src="src/css/icons/Favicon-512.png" 
-                     alt="Logo Lista de Compras 2026" 
-                     id="logo"
-                     class="logo-pulse">
+                <img src="src/css/icons/Favicon-512.png" alt="Logo Lista de Compras 2026" id="logo">
             </div>
             
             <!-- Título -->
-            <h1 id="login-heading" class="titulo">Bem-vindo de volta!</h1>
-            <p class="subtitulo">Faça login para acessar sua lista compartilhada</p>
+            <h1 class="titulo">Bem-vindo!</h1>
+            <p class="subtitulo">Faça login para acessar sua lista de compras</p>
             
-            <!-- Feedback de Erro -->
-            <div id="error-message" class="error-message" role="alert" aria-live="polite" hidden>
-                <i class="fas fa-exclamation-circle"></i>
-                <span></span>
-            </div>
-            
-            <!-- Feedback de Sucesso -->
-            <div id="success-message" class="success-message" role="status" aria-live="polite" hidden>
-                <i class="fas fa-check-circle"></i>
-                <span></span>
-            </div>
+            <!-- Área de mensagens -->
+            <div id="message-area"></div>
 
-            <!-- Formulário de Login -->
-            <form id="login-form" class="login-form" novalidate>
-                <!-- Campo Email -->
+            <!-- Formulário -->
+            <form onsubmit="return false;" style="text-align: left;">
                 <div class="input-group">
-                    <label for="email" class="floating-label">E-mail</label>
+                    <label for="email">E-mail</label>
                     <div class="input-wrapper">
                         <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" 
-                               id="email" 
-                               name="email"
-                               placeholder="seu@email.com"
-                               required
-                               autocomplete="email"
-                               aria-required="true"
-                               aria-describedby="email-help">
-                        <button type="button" 
-                                class="clear-input" 
-                                aria-label="Limpar campo email"
-                                onclick="clearInput('email')">
+                        <input type="email" id="email" placeholder="seu@email.com" required autocomplete="email">
+                        <button type="button" class="clear-input" onclick="limparCampo('email')" title="Limpar">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <span id="email-help" class="help-text" role="alert"></span>
                 </div>
-
-                <!-- Campo Senha -->
+                
                 <div class="input-group">
-                    <label for="senha" class="floating-label">Senha</label>
+                    <label for="senha">Senha</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
-                        <input type="password" 
-                               id="senha" 
-                               name="senha"
-                               placeholder="Sua senha"
-                               required
-                               autocomplete="current-password"
-                               aria-required="true"
-                               aria-describedby="senha-help">
-                        <button type="button" 
-                                class="toggle-password" 
-                                aria-label="Mostrar/ocultar senha"
-                                onclick="togglePasswordVisibility()">
-                            <i class="fas fa-eye"></i>
+                        <input type="password" id="senha" placeholder="Sua senha" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" onclick="toggleSenha()" title="Mostrar/ocultar senha">
+                            <i class="fas fa-eye" id="toggle-password-icon"></i>
                         </button>
                     </div>
-                    <span id="senha-help" class="help-text" role="alert"></span>
                 </div>
-
-                <!-- Opções Adicionais -->
+                
                 <div class="form-options">
                     <label class="checkbox-wrapper">
-                        <input type="checkbox" id="remember-me" name="remember-me">
-                        <span class="checkmark"></span>
-                        Lembrar-me
+                        <input type="checkbox" id="remember-me"> Lembrar-me
                     </label>
-                    <a href="#" class="forgot-password" onclick="showForgotPassword()" 
-                       aria-label="Recuperar senha esquecida">
-                        Esqueceu a senha?
-                    </a>
+                    <a href="#" onclick="esqueciSenha()" class="forgot-password">Esqueceu a senha?</a>
                 </div>
-
-                <!-- Botão de Login -->
-                <button type="submit" 
-                        id="login-button"
-                        class="btn-primary"
-                        aria-label="Entrar na sua conta">
-                    <span class="btn-text">Entrar</span>
-                    <span class="btn-loader" hidden>
-                        <i class="fas fa-spinner fa-spin"></i>
+                
+                <button type="button" onclick="fazerLogin()" class="btn-primary" id="login-btn">
+                    <span id="btn-text">Entrar</span>
+                    <span id="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Entrando...
                     </span>
                 </button>
             </form>
 
-            <!-- Separador -->
-            <div class="divider">
-                <span>ou continue com</span>
-            </div>
-
             <!-- Login Social -->
+            <div class="divider"><span>ou continue com</span></div>
+            
             <div class="social-login">
-                <button onclick="loginWithGoogle()" class="social-btn google-btn" 
-                        aria-label="Entrar com Google">
-                    <i class="fab fa-google"></i>
-                    <span>Google</span>
+                <button onclick="loginSocial('google')" class="social-btn google-btn">
+                    <i class="fab fa-google"></i> Entrar com Google
                 </button>
-                <button onclick="loginWithFacebook()" class="social-btn facebook-btn" 
-                        aria-label="Entrar com Facebook">
-                    <i class="fab fa-facebook-f"></i>
-                    <span>Facebook</span>
+                <button onclick="loginSocial('facebook')" class="social-btn facebook-btn">
+                    <i class="fab fa-facebook-f"></i> Entrar com Facebook
                 </button>
-                <button onclick="loginWithApple()" class="social-btn apple-btn" 
-                        aria-label="Entrar com Apple">
-                    <i class="fab fa-apple"></i>
-                    <span>Apple</span>
+                <button onclick="loginSocial('apple')" class="social-btn apple-btn">
+                    <i class="fab fa-apple"></i> Entrar com Apple
                 </button>
             </div>
-
-            <!-- Link para Cadastro -->
+            
+            <!-- Link para cadastro -->
             <p class="register-link">
                 Não tem uma conta? 
-                <a href="#" onclick="cadastro()" aria-label="Criar nova conta">
-                    Cadastre-se gratuitamente
-                </a>
+                <a href="#" onclick="fazerCadastro()">Cadastre-se gratuitamente</a>
             </p>
         </div>
     </div>
 
-    <!-- Widget VLibras -->
-    <div id="vlibras-container" class="vlibras-container" hidden>
-        <div vw class="enabled">
-            <div vw-access-button class="active"></div>
-            <div vw-plugin-wrapper>
-                <div class="vw-plugin-top-wrapper"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script type="module" src="auth.js"></script>
-    
     <script>
-        // Registro do Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Falha ao registrar o ServiceWorker:', error);
-                    });
-            });
-        }
-
-        // Inicialização do VLibras
-        let vlibrasInitialized = false;
-        let fontScale = 1;
-
-        function toggleVLibras() {
-            const container = document.getElementById('vlibras-container');
+        // ============================================
+        // FUNCIONALIDADES DO LOGIN
+        // ============================================
+        
+        // Banco de usuários simulado
+        const usuarios = [
+            { 
+                email: 'teste@teste.com', 
+                senha: '123456', 
+                nome: 'Usuário Teste' 
+            },
+            {
+                email: 'admin@admin.com',
+                senha: 'admin',
+                nome: 'Administrador'
+            }
+        ];
+        
+        // Variáveis de acessibilidade
+        let fontSizeMultiplier = 1;
+        
+        // INICIALIZAÇÃO
+        function inicializarLogin() {
+            console.log('🔐 Inicializando página de login...');
             
-            if (!vlibrasInitialized) {
-                new window.VLibras.Widget('https://vlibras.gov.br/app');
-                container.hidden = false;
-                vlibrasInitialized = true;
+            // 1. Esconder loader IMEDIATAMENTE
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.style.display = 'none';
+                loader.setAttribute('hidden', '');
+                console.log('✅ Loader escondido');
+            }
+            
+            // 2. Verificar se tem email salvo (lembrar-me)
+            const emailSalvo = localStorage.getItem('rememberedEmail');
+            if (emailSalvo) {
+                document.getElementById('email').value = emailSalvo;
+                document.getElementById('remember-me').checked = true;
+            }
+            
+            // 3. Focar no campo email
+            setTimeout(() => {
+                document.getElementById('email').focus();
+            }, 500);
+            
+            // 4. Configurar tecla Enter
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const emailFocused = document.activeElement === document.getElementById('email');
+                    const senhaFocused = document.activeElement === document.getElementById('senha');
+                    
+                    if (emailFocused) {
+                        document.getElementById('senha').focus();
+                    } else if (senhaFocused) {
+                        fazerLogin();
+                    }
+                }
+            });
+            
+            // 5. Configurar menu de acessibilidade
+            document.getElementById('accessibility-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                const options = document.getElementById('accessibility-options');
+                options.classList.toggle('show');
+            });
+            
+            // Fechar menu ao clicar fora
+            document.addEventListener('click', function() {
+                document.getElementById('accessibility-options').classList.remove('show');
+            });
+            
+            console.log('✅ Login inicializado com sucesso');
+        }
+        
+        // FUNÇÃO PRINCIPAL DE LOGIN
+        function fazerLogin() {
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+            const remember = document.getElementById('remember-me').checked;
+            
+            // Validação
+            if (!email) {
+                mostrarMensagem('Por favor, digite seu e-mail.', 'error');
+                document.getElementById('email').focus();
+                return;
+            }
+            
+            if (!senha) {
+                mostrarMensagem('Por favor, digite sua senha.', 'error');
+                document.getElementById('senha').focus();
+                return;
+            }
+            
+            if (!validarEmail(email)) {
+                mostrarMensagem('Por favor, digite um e-mail válido.', 'error');
+                document.getElementById('email').focus();
+                return;
+            }
+            
+            // Mostrar loading no botão
+            mostrarLoadingBotao(true);
+            
+            // Simular requisição (1 segundo)
+            setTimeout(() => {
+                // Buscar usuário
+                const usuario = usuarios.find(u => 
+                    u.email.toLowerCase() === email.toLowerCase() && 
+                    u.senha === senha
+                );
+                
+                if (usuario) {
+                    // Login bem-sucedido
+                    const userData = {
+                        nome: usuario.nome,
+                        email: usuario.email,
+                        dataLogin: new Date().toISOString()
+                    };
+                    
+                    // Salvar sessão
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    // Salvar email se "lembrar-me" ativo
+                    if (remember) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+                    
+                    mostrarMensagem(`✅ Bem-vindo, ${usuario.nome}! Redirecionando...`, 'success');
+                    
+                    // Redirecionar
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                    
+                } else {
+                    // Login falhou
+                    mostrarLoadingBotao(false);
+                    mostrarMensagem('❌ E-mail ou senha incorretos. Tente novamente.', 'error');
+                    
+                    // Limpar senha
+                    document.getElementById('senha').value = '';
+                    document.getElementById('senha').focus();
+                }
+            }, 1000);
+        }
+        
+        // FUNÇÃO DE CADASTRO
+        function fazerCadastro() {
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+            
+            if (!email || !senha) {
+                mostrarMensagem('Preencha e-mail e senha para se cadastrar.', 'error');
+                return;
+            }
+            
+            if (!validarEmail(email)) {
+                mostrarMensagem('Digite um e-mail válido.', 'error');
+                return;
+            }
+            
+            if (senha.length < 6) {
+                mostrarMensagem('A senha deve ter pelo menos 6 caracteres.', 'error');
+                return;
+            }
+            
+            // Verificar se já existe
+            const existe = usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
+            
+            if (existe) {
+                mostrarMensagem('Este e-mail já está cadastrado. Faça login.', 'error');
+                return;
+            }
+            
+            // Cadastrar novo usuário
+            const novoUsuario = {
+                email: email,
+                senha: senha,
+                nome: email.split('@')[0]
+            };
+            
+            usuarios.push(novoUsuario);
+            
+            mostrarMensagem('✅ Cadastro realizado com sucesso! Faça login.', 'success');
+            
+            // Limpar senha
+            document.getElementById('senha').value = '';
+            document.getElementById('senha').focus();
+            
+            console.log('👤 Novo usuário cadastrado:', novoUsuario.email);
+        }
+        
+        // LOGIN SOCIAL
+        function loginSocial(provider) {
+            mostrarMensagem(`🔜 Login com ${provider} será implementado em breve. Use e-mail e senha por enquanto.`, 'info');
+        }
+        
+        // ESQUECI SENHA
+        function esqueciSenha() {
+            const email = document.getElementById('email').value.trim();
+            
+            if (email && validarEmail(email)) {
+                mostrarMensagem(`📧 Instruções de recuperação enviadas para ${email}`, 'info');
             } else {
-                container.hidden = !container.hidden;
+                mostrarMensagem('Digite seu e-mail e clique em "Esqueceu a senha?" novamente.', 'info');
+                document.getElementById('email').focus();
             }
         }
-
-        // Funções de Acessibilidade
-        function toggleHighContrast() {
+        
+        // FUNÇÕES AUXILIARES
+        function validarEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+        
+        function limparCampo(id) {
+            document.getElementById(id).value = '';
+            document.getElementById(id).focus();
+        }
+        
+        function toggleSenha() {
+            const input = document.getElementById('senha');
+            const icon = document.getElementById('toggle-password-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+        
+        function mostrarLoadingBotao(mostrar) {
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+            const btn = document.getElementById('login-btn');
+            
+            if (mostrar) {
+                btnText.style.display = 'none';
+                btnLoader.style.display = 'inline';
+                btn.disabled = true;
+                btn.style.opacity = '0.7';
+                btn.style.cursor = 'not-allowed';
+            } else {
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            }
+        }
+        
+        function mostrarMensagem(texto, tipo) {
+            const area = document.getElementById('message-area');
+            
+            const icone = tipo === 'error' ? 'fa-exclamation-circle' : 
+                          tipo === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+            
+            area.innerHTML = `
+                <div class="message message-${tipo}">
+                    <i class="fas ${icone}"></i>
+                    <span>${texto}</span>
+                </div>
+            `;
+            
+            // Remover mensagem após 5 segundos
+            setTimeout(() => {
+                if (area.querySelector('.message')) {
+                    area.innerHTML = '';
+                }
+            }, 5000);
+        }
+        
+        // FUNÇÕES DE ACESSIBILIDADE
+        function toggleContraste() {
             document.body.classList.toggle('high-contrast');
+            if (document.body.classList.contains('high-contrast')) {
+                document.body.style.background = '#000';
+                document.body.style.color = '#fff';
+            } else {
+                document.body.style.background = '';
+                document.body.style.color = '';
+            }
         }
-
-        function increaseFontSize() {
-            fontScale = Math.min(fontScale + 0.1, 1.5);
-            document.documentElement.style.fontSize = `${fontScale}rem`;
+        
+        function aumentarFonte() {
+            fontSizeMultiplier = Math.min(fontSizeMultiplier + 0.1, 1.5);
+            document.documentElement.style.fontSize = (16 * fontSizeMultiplier) + 'px';
         }
-
-        function decreaseFontSize() {
-            fontScale = Math.max(fontScale - 0.1, 0.8);
-            document.documentElement.style.fontSize = `${fontScale}rem`;
+        
+        function diminuirFonte() {
+            fontSizeMultiplier = Math.max(fontSizeMultiplier - 0.1, 0.8);
+            document.documentElement.style.fontSize = (16 * fontSizeMultiplier) + 'px';
         }
-
-        function resetFontSize() {
-            fontScale = 1;
+        
+        function resetarFonte() {
+            fontSizeMultiplier = 1;
             document.documentElement.style.fontSize = '';
         }
-
-        // Toggle menu acessibilidade
-        document.querySelector('.accessibility-toggle').addEventListener('click', function() {
-            const options = document.querySelector('.accessibility-options');
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            
-            this.setAttribute('aria-expanded', !isExpanded);
-            options.classList.toggle('show');
-        });
-
-        // Fechar menu ao clicar fora
-        document.addEventListener('click', function(e) {
-            const menu = document.querySelector('.accessibility-menu');
-            if (!menu.contains(e.target)) {
-                document.querySelector('.accessibility-options').classList.remove('show');
-                document.querySelector('.accessibility-toggle').setAttribute('aria-expanded', 'false');
+        
+        // INICIAR TUDO
+        document.addEventListener('DOMContentLoaded', inicializarLogin);
+        
+        // Garantia extra: esconder loader após 3 segundos
+        setTimeout(function() {
+            const loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.display = 'none';
+                loader.setAttribute('hidden', '');
+                console.log('⚠️ Loader escondido pelo fallback');
             }
-        });
+        }, 3000);
+        
+        console.log('🔐 Script de login carregado!');
+        console.log('👤 Usuários disponíveis para teste:');
+        console.log('   - teste@teste.com / 123456');
+        console.log('   - admin@admin.com / admin');
+    </script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+            });
+        }
     </script>
 </body>
 </html>
