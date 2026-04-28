@@ -4,32 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#361134">
-    <meta name="description" content="Lista de Compras 2026 - Gerencie sua lista compartilhada">
     <title>Lista 2026 - Minha Lista de Compras</title>
-    
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="src/css/icons/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="src/css/icons/Favicon-512.png">
-    
-    <!-- Manifest PWA -->
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Font Awesome -->
+    <link rel="shortcut icon" href="src/css/icons/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- CSS Principal -->
     <link rel="stylesheet" href="src/css/index.css">
+    <style>
+        /* Loader fix - garantir que desaparece */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(54, 17, 52, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loader-overlay.hidden,
+        .loader-overlay[hidden] {
+            display: none !important;
+        }
+        
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #fff;
+            border-top-color: #EA3788;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loader-text {
+            color: #fff;
+            margin-top: 10px;
+            font-family: sans-serif;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loader -->
-    <div id="loader" class="loader-overlay" aria-hidden="true" hidden>
+    <!-- Loader - JÁ COMEÇA VISÍVEL MAS SERÁ ESCONDIDO PELO JS -->
+    <div id="loader" class="loader-overlay">
         <div class="loader-spinner"></div>
         <p class="loader-text">Carregando...</p>
     </div>
 
-    <!-- Container Principal -->
     <div class="container">
-        <!-- Header -->
+        <!-- Header com informações do usuário -->
         <header class="header">
             <div class="user-info">
                 <i class="fas fa-user-circle user-avatar"></i>
@@ -38,14 +68,12 @@
                     <span id="user-email" class="user-email">email@exemplo.com</span>
                 </div>
             </div>
-            
             <div class="header-actions">
-                <button onclick="compartilharLista()" class="btn-icon" aria-label="Compartilhar lista" title="Compartilhar">
+                <button onclick="compartilharLista()" class="btn-icon" title="Compartilhar">
                     <i class="fas fa-share-alt"></i>
                 </button>
-                <button onclick="logout()" class="btn-logout" aria-label="Sair da conta" title="Sair">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Sair</span>
+                <button onclick="fazerLogout()" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Sair
                 </button>
             </div>
         </header>
@@ -53,13 +81,12 @@
         <!-- Título -->
         <div class="title-section">
             <h1 class="titulo">
-                <i class="fas fa-shopping-cart"></i>
-                Minha Lista de Compras
+                <i class="fas fa-shopping-cart"></i> Minha Lista de Compras
             </h1>
-            <p id="data-atualizacao" class="update-date"></p>
+            <p id="data-atualizacao" class="update-date">Atualizado agora</p>
         </div>
 
-        <!-- Estatísticas Rápidas -->
+        <!-- Estatísticas -->
         <div class="stats-bar">
             <div class="stat-item">
                 <span id="total-itens" class="stat-number">0</span>
@@ -75,39 +102,27 @@
             </div>
         </div>
 
-        <!-- Barra de Pesquisa e Filtros -->
+        <!-- Pesquisa e Filtros -->
         <div class="search-filter-bar">
             <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" 
-                       id="pesquisa" 
-                       placeholder="Pesquisar itens..."
-                       aria-label="Pesquisar itens da lista"
-                       oninput="filtrarItens()">
-                <button onclick="limparPesquisa()" class="clear-search" aria-label="Limpar pesquisa" hidden>
+                <input type="text" id="pesquisa" placeholder="Pesquisar itens..." oninput="filtrarItens()">
+                <button onclick="limparPesquisa()" class="clear-search" hidden>
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="filter-buttons">
-                <button onclick="filtrarPorCategoria('todos')" class="filter-btn active" data-filter="todos">
-                    Todos
-                </button>
-                <button onclick="filtrarPorCategoria('pendentes')" class="filter-btn" data-filter="pendentes">
-                    Pendentes
-                </button>
-                <button onclick="filtrarPorCategoria('comprados')" class="filter-btn" data-filter="comprados">
-                    Comprados
-                </button>
+                <button onclick="filtrarPorCategoria('todos')" class="filter-btn active" data-filter="todos">Todos</button>
+                <button onclick="filtrarPorCategoria('pendentes')" class="filter-btn" data-filter="pendentes">Pendentes</button>
+                <button onclick="filtrarPorCategoria('comprados')" class="filter-btn" data-filter="comprados">Comprados</button>
             </div>
         </div>
 
         <!-- Lista de Compras -->
         <div id="lista-container" class="lista-container">
-            <ul id="lista" class="shopping-list" role="list" aria-label="Lista de compras">
-                <!-- Itens serão inseridos dinamicamente -->
+            <ul id="lista" class="shopping-list">
+                <!-- Itens serão inseridos aqui -->
             </ul>
-            
-            <!-- Estado Vazio -->
             <div id="empty-state" class="empty-state" hidden>
                 <i class="fas fa-shopping-basket empty-icon"></i>
                 <h3>Sua lista está vazia</h3>
@@ -115,16 +130,12 @@
             </div>
         </div>
 
-        <!-- Adicionar Item -->
+        <!-- Adicionar Novo Item -->
         <div class="add-item-section">
             <div class="add-item-form">
-                <input type="text" 
-                       id="item" 
-                       placeholder="O que você precisa comprar?"
-                       aria-label="Nome do novo item"
-                       autocomplete="off">
-                <select id="categoria" aria-label="Categoria do item" class="categoria-select">
-                    <option value="auto">Auto classificar</option>
+                <input type="text" id="item" placeholder="O que você precisa comprar?" autocomplete="off">
+                <select id="categoria" class="categoria-select">
+                    <option value="auto">🤖 Auto classificar</option>
                     <option value="carnes">🥩 Carnes</option>
                     <option value="vegetais">🥬 Vegetais</option>
                     <option value="frutas">🍎 Frutas</option>
@@ -139,86 +150,384 @@
                     <option value="outros">📦 Outros</option>
                 </select>
                 <div class="quantidade-control">
-                    <button onclick="alterarQuantidade(-1)" class="qty-btn" aria-label="Diminuir quantidade">-</button>
-                    <input type="number" id="quantidade" value="1" min="1" max="99" aria-label="Quantidade">
-                    <button onclick="alterarQuantidade(1)" class="qty-btn" aria-label="Aumentar quantidade">+</button>
+                    <button onclick="mudarQuantidade(-1)" class="qty-btn">-</button>
+                    <input type="number" id="quantidade" value="1" min="1" max="99">
+                    <button onclick="mudarQuantidade(1)" class="qty-btn">+</button>
                 </div>
-                <button onclick="adicionarItem()" class="btn-add" aria-label="Adicionar item à lista">
-                    <i class="fas fa-plus"></i>
-                    Adicionar
+                <button onclick="adicionarItem()" class="btn-add">
+                    <i class="fas fa-plus"></i> Adicionar
                 </button>
             </div>
             
             <!-- Sugestões Rápidas -->
             <div class="quick-suggestions">
                 <span class="suggestion-label">Sugestões:</span>
-                <button onclick="adicionarSugestao('Arroz')" class="suggestion-chip">Arroz</button>
-                <button onclick="adicionarSugestao('Feijão')" class="suggestion-chip">Feijão</button>
-                <button onclick="adicionarSugestao('Leite')" class="suggestion-chip">Leite</button>
-                <button onclick="adicionarSugestao('Pão')" class="suggestion-chip">Pão</button>
-                <button onclick="adicionarSugestao('Ovos')" class="suggestion-chip">Ovos</button>
+                <button onclick="adicionarSugestao('Arroz')" class="suggestion-chip">🍚 Arroz</button>
+                <button onclick="adicionarSugestao('Feijão')" class="suggestion-chip">🫘 Feijão</button>
+                <button onclick="adicionarSugestao('Leite')" class="suggestion-chip">🥛 Leite</button>
+                <button onclick="adicionarSugestao('Pão')" class="suggestion-chip">🍞 Pão</button>
+                <button onclick="adicionarSugestao('Ovos')" class="suggestion-chip">🥚 Ovos</button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script type="module" src="app.js"></script>
-    
     <script>
-        // Registro do Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado com sucesso:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Falha ao registrar o ServiceWorker:', error);
-                    });
-            });
-        }
-
-        // Função de Logout
-        function logout() {
-            if (confirm('Tem certeza que deseja sair?')) {
-                // Limpar dados da sessão
-                localStorage.removeItem('userToken');
-                localStorage.removeItem('userData');
-                sessionStorage.clear();
-                
-                // Redirecionar para login
-                window.location.href = 'login.html';
+        // ============================================
+        // SCRIPT PRINCIPAL - FUNCIONAMENTO GARANTIDO
+        // ============================================
+        
+        // Dados iniciais de exemplo
+        let listaCompras = [
+            { id: 1, nome: "Peito de Frango", categoria: "carnes", quantidade: 2, comprado: false, emoji: "🍗" },
+            { id: 2, nome: "Alface", categoria: "vegetais", quantidade: 1, comprado: false, emoji: "🥬" },
+            { id: 3, nome: "Banana", categoria: "frutas", quantidade: 6, comprado: true, emoji: "🍌" },
+            { id: 4, nome: "Leite Integral", categoria: "laticinios", quantidade: 2, comprado: false, emoji: "🥛" },
+            { id: 5, nome: "Detergente", categoria: "limpeza", quantidade: 1, comprado: false, emoji: "🧴" }
+        ];
+        
+        let filtroAtual = 'todos';
+        
+        // Classificação automática
+        const classificacao = {
+            carnes: ['carne', 'frango', 'peixe', 'porco', 'boi', 'bacon', 'presunto', 'linguiça', 'salsicha', 'hambúrguer', 'bife', 'costela'],
+            vegetais: ['alface', 'tomate', 'cebola', 'alho', 'cenoura', 'batata', 'brócolis', 'couve', 'espinafre', 'pimentão', 'abóbora', 'beterraba'],
+            frutas: ['banana', 'maçã', 'laranja', 'uva', 'morango', 'abacaxi', 'manga', 'melancia', 'pera', 'limão', 'abacate', 'mamão'],
+            laticinios: ['leite', 'queijo', 'manteiga', 'iogurte', 'requeijão', 'creme de leite', 'margarina', 'muçarela'],
+            padaria: ['pão', 'bolo', 'biscoito', 'torrada', 'bolacha', 'croissant', 'baguete', 'pão de queijo'],
+            bebidas: ['água', 'refrigerante', 'suco', 'cerveja', 'vinho', 'café', 'chá', 'energético', 'coca'],
+            limpeza: ['detergente', 'sabão', 'desinfetante', 'água sanitária', 'limpador', 'esponja', 'vassoura', 'saco de lixo', 'lustra'],
+            higiene: ['shampoo', 'condicionador', 'sabonete', 'pasta de dente', 'escova', 'desodorante', 'perfume', 'papel higiênico'],
+            enlatados: ['sardinha', 'atum', 'milho', 'ervilha', 'molho de tomate', 'azeitona', 'palmito', 'seleta'],
+            graos: ['arroz', 'feijão', 'lentilha', 'grão de bico', 'aveia', 'farinha', 'macarrão', 'quinoa'],
+            temperos: ['sal', 'açúcar', 'pimenta', 'orégano', 'cominho', 'azeite', 'óleo', 'vinagre', 'molho shoyu', 'ketchup', 'mostarda']
+        };
+        
+        const emojisCategorias = {
+            carnes: '🥩', vegetais: '🥬', frutas: '🍎', laticinios: '🧀',
+            padaria: '🍞', bebidas: '🥤', limpeza: '🧹', higiene: '🧴',
+            enlatados: '🥫', graos: '🌾', temperos: '🌶️', outros: '📦'
+        };
+        
+        // INICIALIZAÇÃO - Executa assim que a página carregar
+        function inicializarApp() {
+            console.log('🚀 Inicializando app...');
+            
+            // 1. ESCONDER LOADER IMEDIATAMENTE
+            const loader = document.getElementById('loader');
+            if (loader) {
+                loader.style.display = 'none';
+                loader.setAttribute('hidden', '');
+                console.log('✅ Loader escondido');
             }
-        }
-
-        // Funções auxiliares
-        function compartilharLista() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Minha Lista de Compras',
-                    text: 'Veja minha lista de compras!',
-                    url: window.location.href
-                }).catch(console.error);
+            
+            // 2. Verificar usuário
+            let userData = localStorage.getItem('userData');
+            if (!userData) {
+                userData = { nome: 'Usuário Demo', email: 'demo@exemplo.com' };
+                localStorage.setItem('userData', JSON.stringify(userData));
             } else {
-                alert('Compartilhamento não suportado neste navegador');
+                userData = JSON.parse(userData);
+            }
+            
+            document.getElementById('user-name').textContent = userData.nome;
+            document.getElementById('user-email').textContent = userData.email;
+            
+            // 3. Carregar dados salvos ou usar demo
+            const salvos = localStorage.getItem('listaCompras');
+            if (salvos) {
+                try {
+                    listaCompras = JSON.parse(salvos);
+                    console.log('📝 Dados carregados do localStorage');
+                } catch(e) {
+                    console.error('Erro ao carregar dados salvos');
+                }
+            }
+            
+            // 4. Atualizar interface
+            atualizarTudo();
+            
+            // 5. Configurar evento Enter no input
+            document.getElementById('item').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') adicionarItem();
+            });
+            
+            // 6. Configurar evento de pesquisa
+            document.getElementById('pesquisa').addEventListener('input', function() {
+                document.querySelector('.clear-search').hidden = this.value.length === 0;
+                atualizarTudo();
+            });
+            
+            console.log('✅ App inicializado com ' + listaCompras.length + ' itens');
+        }
+        
+        // Salvar no localStorage
+        function salvarDados() {
+            localStorage.setItem('listaCompras', JSON.stringify(listaCompras));
+        }
+        
+        // Classificar automaticamente
+        function classificarItem(nome) {
+            const n = nome.toLowerCase();
+            for (let categoria in classificacao) {
+                if (classificacao[categoria].some(palavra => n.includes(palavra))) {
+                    return categoria;
+                }
+            }
+            return 'outros';
+        }
+        
+        // ADICIONAR ITEM
+        function adicionarItem() {
+            const inputItem = document.getElementById('item');
+            const inputQtd = document.getElementById('quantidade');
+            const selectCat = document.getElementById('categoria');
+            
+            const nome = inputItem.value.trim();
+            if (!nome) {
+                alert('Por favor, digite o nome do item!');
+                inputItem.focus();
+                return;
+            }
+            
+            const quantidade = parseInt(inputQtd.value) || 1;
+            let categoria = selectCat.value;
+            
+            if (categoria === 'auto') {
+                categoria = classificarItem(nome);
+            }
+            
+            const novoItem = {
+                id: Date.now(),
+                nome: nome,
+                categoria: categoria,
+                quantidade: quantidade,
+                comprado: false,
+                emoji: emojisCategorias[categoria] || '📦'
+            };
+            
+            listaCompras.unshift(novoItem);
+            salvarDados();
+            atualizarTudo();
+            
+            // Limpar formulário
+            inputItem.value = '';
+            inputQtd.value = '1';
+            selectCat.value = 'auto';
+            inputItem.focus();
+            
+            console.log('✅ Item adicionado:', nome);
+        }
+        
+        // MARCAR/DESMARCAR ITEM
+        function toggleItem(id) {
+            const item = listaCompras.find(i => i.id === id);
+            if (item) {
+                item.comprado = !item.comprado;
+                salvarDados();
+                atualizarTudo();
             }
         }
-
-        function alterarQuantidade(delta) {
-            const qtyInput = document.getElementById('quantidade');
-            let value = parseInt(qtyInput.value) + delta;
-            qtyInput.value = Math.max(1, Math.min(99, value));
+        
+        // REMOVER ITEM
+        function removerItem(id) {
+            const item = listaCompras.find(i => i.id === id);
+            if (item && confirm(`Remover "${item.nome}" da lista?`)) {
+                listaCompras = listaCompras.filter(i => i.id !== id);
+                salvarDados();
+                atualizarTudo();
+            }
         }
-
+        
+        // FILTRAR POR CATEGORIA
+        function filtrarPorCategoria(filtro) {
+            filtroAtual = filtro;
+            
+            // Atualizar botões
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-filter') === filtro) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            atualizarTudo();
+        }
+        
+        // FILTRAR ITENS (pesquisa)
+        function filtrarItens() {
+            atualizarTudo();
+        }
+        
+        // ATUALIZAR TUDO
+        function atualizarTudo() {
+            const termo = document.getElementById('pesquisa').value.toLowerCase().trim();
+            
+            // Filtrar itens
+            let itensFiltrados = [...listaCompras];
+            
+            if (filtroAtual === 'comprados') {
+                itensFiltrados = itensFiltrados.filter(i => i.comprado);
+            } else if (filtroAtual === 'pendentes') {
+                itensFiltrados = itensFiltrados.filter(i => !i.comprado);
+            }
+            
+            if (termo) {
+                itensFiltrados = itensFiltrados.filter(i => 
+                    i.nome.toLowerCase().includes(termo) || 
+                    i.categoria.toLowerCase().includes(termo)
+                );
+            }
+            
+            // Ordenar: pendentes primeiro
+            itensFiltrados.sort((a, b) => {
+                if (a.comprado === b.comprado) return 0;
+                return a.comprado ? 1 : -1;
+            });
+            
+            // Atualizar lista
+            const listaEl = document.getElementById('lista');
+            const emptyEl = document.getElementById('empty-state');
+            
+            if (itensFiltrados.length === 0) {
+                listaEl.innerHTML = '';
+                emptyEl.hidden = false;
+            } else {
+                emptyEl.hidden = true;
+                listaEl.innerHTML = itensFiltrados.map(item => `
+                    <li class="${item.comprado ? 'comprado' : ''}" style="
+                        background: #f8f9fa;
+                        border: 1px solid #dee2e6;
+                        border-radius: 12px;
+                        padding: 12px 16px;
+                        margin-bottom: 8px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        ${item.comprado ? 'opacity: 0.6; text-decoration: line-through;' : ''}
+                    ">
+                        <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                            <span style="font-size: 1.5rem;">${item.emoji}</span>
+                            <div>
+                                <div style="font-weight: 500;">${item.nome}</div>
+                                <span style="
+                                    font-size: 0.75rem;
+                                    background: #B0228C;
+                                    color: white;
+                                    padding: 2px 8px;
+                                    border-radius: 12px;
+                                ">${item.categoria}</span>
+                            </div>
+                            <span style="
+                                margin-left: auto;
+                                background: #361134;
+                                color: white;
+                                padding: 2px 10px;
+                                border-radius: 12px;
+                                font-weight: 600;
+                            ">x${item.quantidade}</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-left: 10px;">
+                            <button onclick="toggleItem(${item.id})" style="
+                                background: ${item.comprado ? '#ffc107' : '#28a745'};
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                width: 32px;
+                                height: 32px;
+                                cursor: pointer;
+                                font-size: 0.9rem;
+                            " title="${item.comprado ? 'Desmarcar' : 'Marcar como comprado'}">
+                                <i class="fas ${item.comprado ? 'fa-undo' : 'fa-check'}"></i>
+                            </button>
+                            <button onclick="removerItem(${item.id})" style="
+                                background: #dc3545;
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                width: 32px;
+                                height: 32px;
+                                cursor: pointer;
+                                font-size: 0.9rem;
+                            " title="Remover">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                `).join('');
+            }
+            
+            // Atualizar estatísticas
+            document.getElementById('total-itens').textContent = listaCompras.length;
+            document.getElementById('itens-comprados').textContent = listaCompras.filter(i => i.comprado).length;
+            document.getElementById('categorias-count').textContent = new Set(listaCompras.map(i => i.categoria)).size;
+            
+            // Atualizar data
+            const agora = new Date();
+            document.getElementById('data-atualizacao').textContent = 
+                'Atualizado: ' + agora.toLocaleDateString('pt-BR') + ' às ' + 
+                agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+        }
+        
+        // Funções auxiliares
+        function mudarQuantidade(delta) {
+            const qty = document.getElementById('quantidade');
+            qty.value = Math.max(1, Math.min(99, parseInt(qty.value) + delta));
+        }
+        
         function limparPesquisa() {
             document.getElementById('pesquisa').value = '';
-            filtrarItens();
+            document.querySelector('.clear-search').hidden = true;
+            atualizarTudo();
         }
-
+        
         function adicionarSugestao(item) {
             document.getElementById('item').value = item;
             document.getElementById('quantidade').value = 1;
+            document.getElementById('categoria').value = 'auto';
             adicionarItem();
+        }
+        
+        function compartilharLista() {
+            const texto = '🛒 Minha Lista de Compras:\n\n' + 
+                listaCompras.map(i => `${i.comprado ? '✅' : '⬜'} ${i.quantidade}x ${i.nome}`).join('\n');
+            
+            if (navigator.share) {
+                navigator.share({ title: 'Lista de Compras', text: texto });
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(texto).then(() => alert('📋 Lista copiada!'));
+            } else {
+                alert(texto);
+            }
+        }
+        
+        function fazerLogout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                localStorage.removeItem('userData');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        // INICIAR TUDO
+        document.addEventListener('DOMContentLoaded', inicializarApp);
+        
+        // Garantir que o loader suma mesmo se houver erro
+        setTimeout(function() {
+            const loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.display = 'none';
+                loader.setAttribute('hidden', '');
+            }
+        }, 3000);
+        
+        console.log('📋 Script carregado com sucesso!');
+    </script>
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+            });
         }
     </script>
 </body>
